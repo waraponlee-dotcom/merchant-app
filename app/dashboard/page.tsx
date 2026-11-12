@@ -86,7 +86,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <h2 className="text-base font-extrabold">สรุปภาพรวม</h2>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={exportCsv} className="rounded-full border border-line bg-white px-4 py-2.5 text-sm font-bold transition active:scale-95">ส่งออก CSV</button>
+            <button type="button" onClick={exportCsv} className="rounded-full bg-brand px-4 py-2.5 text-sm font-extrabold text-white shadow-md shadow-brand/30 transition hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:scale-95">ส่งออก CSV</button>
             <Link href="/dashboard/detail" className="rounded-full bg-ink px-4 py-2.5 text-sm font-bold text-white transition active:scale-95">ดูเพิ่มเติม</Link>
           </div>
         </div>
