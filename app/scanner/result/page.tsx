@@ -62,6 +62,7 @@ function DetailMer({ resultMer }: { resultMer: ScanResultMer }) {
     <section className={cardMer}>
       <h2 className="font-bold">รายละเอียดรายการ</h2>
       <dl className="mt-2">
+        <RowMer labelMer="เลขออเดอร์" valueMer={resultMer.orderNo ?? "-"} />
         {okMer
           ? <RowMer labelMer="เลขที่รายการ" valueMer={resultMer.refNo ?? "-"} />
           : <RowMer labelMer="ยอดที่ต้องชำระ" valueMer={fmtTokenMer(resultMer.total, resultMer.symbol)} />}
@@ -136,6 +137,7 @@ export default function ScanResultPageMer() {
             <p className="mt-1 text-sm text-muted">ยังไม่ทราบผลชำระของรายการนี้</p>
             <p className="mt-2 text-[36px] font-extrabold leading-none">{amountMer}</p>
             <p className="mt-2 text-xs text-muted">{resultMer.productName} × {resultMer.qty} ชิ้น · {fmtTokenMer(resultMer.unitPrice, resultMer.symbol)} ต่อชิ้น</p>
+            <p className="mt-2 text-sm font-bold">เลขออเดอร์ {resultMer.orderNo ?? "-"}</p>
           </section>
 
           <p role="alert" className="flex items-center gap-3 rounded-2xl border border-roseink/60 bg-rose/10 px-4 py-3 text-sm font-semibold">

@@ -39,6 +39,7 @@ export function BackHeader({ title, fallbackHref }: { title: string; fallbackHre
 const STATUS: Record<TxStatus, { label: string; cls: string }> = {
   success: { label: "สำเร็จ", cls: "bg-mint/25 text-mintink" },
   pending: { label: "รอชำระ", cls: "bg-sun/30 text-amberink" },
+  insufficient: { label: "Token ไม่พอ", cls: "bg-sun/30 text-amberink" },
   cancelled: { label: "ยกเลิก", cls: "bg-rose/15 text-roseink" },
 };
 export function StatusBadge({ status, className = "" }: { status: TxStatus; className?: string }) {

@@ -14,7 +14,7 @@ export default function AllTransactionsPage() {
   const sum = summarize(s);
   const list = sum.todayList;
   const rows = list.slice(0, shown);
-  const cols = "grid grid-cols-[3.5rem_minmax(0,1fr)_2.5rem_4.75rem] items-center gap-2";
+  const cols = "grid grid-cols-[5.5rem_minmax(0,1fr)_2.5rem_4.75rem] items-center gap-2";
 
   return (
     <main className="min-h-dvh safe-bottom">
@@ -27,13 +27,13 @@ export default function AllTransactionsPage() {
 
         <div className="rounded-3xl border border-line bg-white px-4 pb-3 pt-3 text-sm">
           <div className={`${cols} border-b border-line pb-2 text-xs text-muted`}>
-            <span>วัน/เวลา</span><span>ชื่อลูกค้า</span><span className="text-right">จำนวน</span><span className="text-right">ราคารวม</span>
+            <span>ออเดอร์ / เวลา</span><span>ชื่อลูกค้า</span><span className="text-right">จำนวน</span><span className="text-right">ราคารวม</span>
           </div>
           {rows.length === 0 && <p className="py-8 text-center text-xs text-muted">วันนี้ยังไม่มีรายการ</p>}
           <ul>
             {rows.map((t) => (
               <li key={t.id} className={`${cols} border-b border-line py-3 last:border-0`}>
-                <span className="leading-tight"><span className="block text-[11px] text-muted">{fmtDate(t.at)}</span><span className="block font-bold">{fmtTime(t.at)}</span></span>
+                <span className="leading-tight"><span className="block truncate text-[11px] font-bold">{t.orderNo}</span><span className="block text-[10px] text-muted">{fmtDate(t.at)} {fmtTime(t.at)}</span></span>
                 <span className="min-w-0">
                   <span className="block truncate font-bold">{t.payerName}</span>
                   {t.status !== "success" && <StatusBadge status={t.status} className="mt-1 !px-2 !py-0.5 !text-[10px]" />}

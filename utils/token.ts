@@ -4,11 +4,12 @@
 // ตัวแปร / ฟังก์ชัน / type ทุกตัวลงท้ายด้วย "Mer"
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type TxStatusMer = "success" | "pending" | "cancelled";
+export type TxStatusMer = "success" | "pending" | "insufficient" | "cancelled";
 
 /** หนึ่งรายการ Token ที่ร้านค้าได้รับ (tokens = qty × ราคา *ณ ตอนนั้น*) */
 export interface TokenTxMer {
   id: string;
+  orderNo: string;
   ref?: string;               // เลขที่รายการที่โชว์ให้คนอ่าน เช่น TX-20418
   at: string;                 // ISO
   qty: number;
@@ -34,6 +35,7 @@ export interface ScanResultMer {
   sentAt: string;             // ส่งยอดไปที่เครื่อง
   scannedAt?: string;         // ลูกค้าสแกนที่เครื่อง
   checkedAt: string;          // ตรวจสอบ / ชำระสำเร็จ
+  orderNo?: string;
   txId?: string;
   refNo?: string;
 }
@@ -57,7 +59,12 @@ export const makeTxIdMer = () => `tx_${Date.now().toString(36)}${Math.random().t
 /** TX-20418 — เลขรันต่อจากจำนวนรายการที่มีอยู่ */
 export const makeRefNoMer = (existingCountMer: number) => `TX-${20000 + existingCountMer + 1}`;
 
+/** เลขออเดอร์ประจำบูธ เช่น B12-0001 */
+export const makeOrderNoMer = (boothMer: string, sequenceMer: number) =>
+  `${boothMer}-${String(sequenceMer).padStart(4, "0")}`;
+
 export function buildTxMer(inputMer: {
+  orderNo: string;
   qty: number;
   unitPrice: number;
   payerName: string;
@@ -68,6 +75,7 @@ export function buildTxMer(inputMer: {
 }): TokenTxMer {
   return {
     id: makeTxIdMer(),
+    orderNo: inputMer.orderNo,
     ref: makeRefNoMer(inputMer.existingCount),
     at: inputMer.at ?? new Date().toISOString(),
     qty: inputMer.qty,
@@ -99,6 +107,7 @@ export function buildSimPaymentMer(kindMer: ScanKindMer, totalMer: number, unitP
 
 export function buildScanResultMer(inputMer: {
   kind: ScanKindMer;
+  orderNo: string;
   productName: string;
   unitPrice: number;
   qty: number;
@@ -112,6 +121,7 @@ export function buildScanResultMer(inputMer: {
 }): ScanResultMer {
   return {
     kind: inputMer.kind,
+    orderNo: inputMer.orderNo,
     productName: inputMer.productName,
     unitPrice: inputMer.unitPrice,
     qty: inputMer.qty,

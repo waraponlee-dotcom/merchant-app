@@ -8,7 +8,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  background-color: #ebe8f8; /* shows beside the 430px column on desktop */
+  background-color: #ebe8f8;
 }
 
 html,
@@ -49,6 +49,13 @@ button {
 }
 .safe-bottom {
   padding-bottom: calc(env(safe-area-inset-bottom) + 2.5rem);
+}
+
+@media (min-width: 768px) {
+  html,
+  body {
+    background-color: #f6f4ff;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

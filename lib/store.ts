@@ -7,7 +7,7 @@ import { fetchMerchantConfig, hasAdminApi } from "./api";
 import { defaultConfig, type MerchantConfig } from "./config";
 import { dayKey, isToday } from "./format";
 // Token logic อยู่ที่ utils/token.ts (ใช้ร่วมกับทีมอื่นได้)
-import { buildTxMer, clampQtyMer, makeTxIdMer, type TokenTxMer, type TxStatusMer } from "@/utils/token";
+import { buildTxMer, clampQtyMer, makeOrderNoMer, makeTxIdMer, type TokenTxMer, type TxStatusMer } from "@/utils/token";
 
 export type { MerchantConfig, Product, Profile } from "./config";
 export type TxStatus = TxStatusMer;
@@ -16,6 +16,7 @@ export interface AppState {
   config: MerchantConfig;
   currentQty: number;          // quantity sent to the Handheld Scanner
   txs: TokenTx[];              // newest first
+  orderCounters: Record<string, number>;
   configSyncedAt: string | null;
 }
 
@@ -25,6 +26,7 @@ const clampQty = clampQtyMer;
 
 function seed(): AppState {
   const config = defaultConfig();
+  const booth = config.profile.booth;
   const at = (h: number, m: number) => { const d = new Date(); d.setHours(h, m, 0, 0); return d.toISOString(); };
   const first: [number, number, string, number][] = [
     [21, 46, "สมชาย ใจดี", 3], [21, 42, "ปรียา แสงทอง", 2], [21, 38, "ธนากร วงศ์สกุล", 1], [21, 31, "กมลชนก รัตนพันธ์", 3],
@@ -36,10 +38,12 @@ function seed(): AppState {
     const mins = 20 * 60 + 58 - 7 * i;
     return [Math.floor(mins / 60), mins % 60, names[i % names.length], q];
   });
+  const orders = [...first, ...rest];
   return {
-    config, currentQty: 1, configSyncedAt: null,
-    txs: [...first, ...rest].map(([h, m, payerName, qty]) => ({
-      id: uid(), at: at(h, m), qty, tokens: qty * config.product.unitPrice, payerName, status: "success" as const,
+    config, currentQty: 1, configSyncedAt: null, orderCounters: { [booth]: orders.length },
+    txs: orders.map(([h, m, payerName, qty], index) => ({
+      id: uid(), orderNo: makeOrderNoMer(booth, orders.length - index), at: at(h, m), qty,
+      tokens: qty * config.product.unitPrice, payerName, status: "success" as const,
     })),
   };
 }
@@ -50,10 +54,41 @@ const persist = (s: AppState) => { try { localStorage.setItem(KEY, JSON.stringif
 function load(): AppState {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) { const s = JSON.parse(raw) as AppState; if (s?.config && Array.isArray(s.txs)) return s; }
+    if (raw) {
+      const s = JSON.parse(raw) as AppState;
+      if (s?.config && Array.isArray(s.txs)) {
+        const migrated = migrateOrderNumbers(s);
+        if (JSON.stringify(migrated) !== JSON.stringify(s)) persist(migrated);
+        return migrated;
+      }
+    }
   } catch {}
   const s = seed(); persist(s); return s;
 }
+
+function migrateOrderNumbers(s: AppState): AppState {
+  const orderCounters = { ...(s.orderCounters ?? {}) };
+  for (const tx of s.txs) {
+    if (!tx.orderNo) continue;
+    const separator = tx.orderNo.lastIndexOf("-");
+    const sequence = Number(tx.orderNo.slice(separator + 1));
+    if (separator > 0 && Number.isSafeInteger(sequence) && sequence > 0) {
+      const booth = tx.orderNo.slice(0, separator);
+      orderCounters[booth] = Math.max(orderCounters[booth] ?? 0, sequence);
+    }
+  }
+
+  const booth = s.config.profile.booth;
+  const txs = [...s.txs];
+  for (let i = txs.length - 1; i >= 0; i--) {
+    if (txs[i].orderNo) continue;
+    const sequence = (orderCounters[booth] ?? 0) + 1;
+    orderCounters[booth] = sequence;
+    txs[i] = { ...txs[i], orderNo: makeOrderNoMer(booth, sequence) };
+  }
+  return { ...s, txs, orderCounters };
+}
+
 const getSnapshot = () => (cache ??= load());
 /** อ่าน state ปัจจุบันแบบไม่ใช้ hook (สำหรับ utils/scanFlow.ts) */
 export const getStateMer = getSnapshot;
@@ -86,12 +121,20 @@ export const actions = {
     }
   },
 
-  /** Call when the Handheld Scanner reports a paid order (status "pending" = ยังไม่ทราบผล). */
+  /** Record a payment attempt; only "success" transactions count toward sales totals. */
   receiveTokens(o: { payerName: string; payerEmail?: string; qty?: number; status?: TxStatusMer }) {
     const s = getSnapshot(); const qty = o.qty ?? s.currentQty;
-    const tx = buildTxMer({ qty, unitPrice: s.config.product.unitPrice, payerName: o.payerName,
+    const booth = s.config.profile.booth;
+    const sequence = (s.orderCounters[booth] ?? 0) + 1;
+    const orderNo = makeOrderNoMer(booth, sequence);
+    const tx = buildTxMer({ orderNo, qty, unitPrice: s.config.product.unitPrice, payerName: o.payerName,
       payerEmail: o.payerEmail, status: o.status, existingCount: s.txs.length });
-    commit({ ...s, txs: [tx, ...s.txs] }); return tx;
+    commit({
+      ...s,
+      orderCounters: { ...s.orderCounters, [booth]: sequence },
+      txs: [tx, ...s.txs],
+    });
+    return tx;
   },
   /** แก้รายการเดิม เช่น pending → success หลังเครื่อง Scanner เชื่อมต่อกลับมา */
   updateTx(idMer: string, patchMer: Partial<Omit<TokenTxMer, "id">>) {

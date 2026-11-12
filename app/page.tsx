@@ -14,8 +14,8 @@ export default function Home() {
   const sum = summarize(s);
 
   return (
-    <main className="min-h-dvh pb-32">
-      <Hero className="safe-top-hero rounded-b-[32px] px-5 pb-14">
+    <main className="min-h-dvh pb-32 md:pb-10">
+      <Hero className="safe-top-hero rounded-b-[32px] px-5 pb-14 md:rounded-b-[36px] md:px-10 md:pb-16">
         <p className="text-sm opacity-90">{p.shopName} · บูธ {p.booth}</p>
         <p className="mt-4 text-sm">Token ที่ได้รับทั้งหมด</p>
         <p className="mt-1 text-[44px] font-extrabold leading-none">
@@ -27,8 +27,8 @@ export default function Home() {
         </p>
       </Hero>
 
-      <div className="relative -mt-9 space-y-4 px-5">
-        <div className="grid grid-cols-2 gap-3">
+      <div className="relative -mt-9 space-y-4 px-5 md:mx-auto md:-mt-10 md:grid md:max-w-[1240px] md:grid-cols-12 md:gap-5 md:space-y-0 md:px-8 md:pb-8 md:pt-0">
+        <div className="grid grid-cols-2 gap-3 md:col-span-12 md:grid-cols-4 md:gap-5">
           <div className="rounded-3xl border border-line bg-white p-4">
             <p className="flex items-center gap-2 text-xs text-muted">
               <span className="grid h-8 w-8 place-items-center rounded-full bg-mint/25 text-mintink"><IconDown size={16} /></span>Token วันนี้
@@ -44,7 +44,7 @@ export default function Home() {
         </div>
 
         {/* Product strip — multiplier comes from the Scanner quantity page */}
-        <div className="flex items-center gap-3 rounded-3xl border border-line bg-white p-3">
+        <div className="flex items-center gap-3 rounded-3xl border border-line bg-white p-3 md:col-span-12 md:p-5">
           <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-sun to-rose text-white"><IconCup size={22} /></span>
           <div className="min-w-0 flex-1">
             <p className="truncate font-bold">{pr.name}{qty > 1 && <span> × {qty}</span>}</p>
@@ -57,22 +57,22 @@ export default function Home() {
           <Link href="/scanner" className="shrink-0 rounded-full bg-ink px-4 py-2.5 text-sm font-bold text-white transition active:scale-95">ปรับจำนวน</Link>
         </div>
 
-        <div className="flex items-end justify-between pt-2">
+        <div className="flex items-end justify-between pt-2 md:col-span-12 md:pt-2">
           <h2 className="text-lg font-extrabold">Token ที่ได้รับล่าสุด</h2>
           <Link href="/dashboard/all" className="py-1 text-sm font-semibold text-brand">ดูทั้งหมด</Link>
         </div>
         {sum.recent.length === 0 ? (
-          <p className="rounded-3xl border border-dashed border-line px-4 py-8 text-center text-sm text-muted">
+          <p className="rounded-3xl border border-dashed border-line px-4 py-8 text-center text-sm text-muted md:col-span-12">
             ยังไม่มีรายการ — Token จะแสดงที่นี่เมื่อลูกค้าสแกนจ่ายที่เครื่อง
           </p>
         ) : (
-          <ul className="space-y-3">
+          <ul className="space-y-3 md:col-span-12 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-4 md:space-y-0">
             {sum.recent.map((t) => (
               <li key={t.id} className="flex items-center gap-3">
                 <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-mint/25 text-mintink"><IconDown /></span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-bold">{pr.name} ×{t.qty}</p>
-                  <p className="truncate text-xs text-muted">จาก {maskName(t.payerName)} · ชำระด้วย Token</p>
+                  <p className="truncate text-xs text-muted">ออเดอร์ {t.orderNo} · จาก {maskName(t.payerName)}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-extrabold text-mintink">+{fmtNum(t.tokens)} {tkn}</p>

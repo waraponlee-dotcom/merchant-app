@@ -12,7 +12,7 @@ npm run dev                  # http://localhost:3000  (open on a phone-sized scr
 | `/` | หน้าหลัก — total / today tokens, product strip, latest received |
 | `/scanner` | ปรับจำนวน + กล้องสแกน QR + ปุ่มจำลองผลสแกน 3 แบบ (dev) |
 | `/scanner/result` | ผลการรับชำระ: สำเร็จ / Token ลูกค้าไม่พอ / Scanner หลุดการเชื่อมต่อ |
-| `/dashboard` | แดชบอร์ดร้าน — summary, shop info, stock |
+| `/dashboard` | แดชบอร์ดร้าน — summary, shop info, stock, export all order attempts to CSV |
 | `/dashboard/detail` | latest transactions + รายงานสรุป per day |
 | `/dashboard/all` | today's transactions (7 at a time) + สรุปวันนี้ |
 | `/help` | contact Super Admin + FAQ |
@@ -42,8 +42,16 @@ Each transaction stores the token amount at the price in effect when it was rece
 ## Tokens (still local)
 - `lib/store.ts` keeps received tokens in `localStorage` (`merchant-app:v2`). Replace `load`/`persist` with an API later.
 - `actions.setQty(n)` is written by **/scanner** and read by **/**.
-- `actions.receiveTokens({...})` is what the Handheld Scanner callback will call. A dev-only button on /scanner simulates it.
+- `actions.receiveTokens({...})` records each Handheld Scanner payment attempt with its outcome status. The dev-only buttons on `/scanner` simulate the outcomes.
 - Reset demo data: `actions.reset()` or delete the key in DevTools → Application → Local Storage.
+- Every scan attempt creates a transaction, including insufficient-token attempts (`insufficient`) and disconnected attempts (`pending`). Only `success` transactions count toward received-token and sold-quantity totals.
+- Order numbers are booth-prefixed and zero-padded, e.g. `B12-0001`. The per-booth counter is persisted in this browser; older saved transactions are assigned numbers when loaded. A shared backend must issue numbers if multiple devices need a globally unique sequence.
+- The `/dashboard` CSV button exports all transactions and statuses as UTF-8 CSV with a BOM for Thai spreadsheet compatibility.
+
+## Logout integration
+- The navigation logout button removes the authentication value stored under the `credential` key in `localStorage`, then returns to `/`.
+- This project does not include a login screen, credential creation, or route protection. The authentication owner must save the real credential under this key and connect the app's route/session guard when that integration is ready.
+- Do not store a production secret in a `NEXT_PUBLIC_` variable. If authentication uses an HttpOnly cookie or server session instead of this localStorage key, update the logout helper to call the authentication provider/server endpoint.
 
 ## utils/ (Token system ที่ทีมอื่นดึงไปใช้ได้)
 - `utils/token.ts` — logic ล้วน ไม่พึ่ง React: `calcTotalMer`, `checkPaymentMer`, `buildTxMer`, `fmtTokenMer`, types `TokenTxMer`, `ScanResultMer` …

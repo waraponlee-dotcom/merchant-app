@@ -17,6 +17,7 @@ import {
   checkPaymentMer,
   type ScanKindMer,
   type ScanResultMer,
+  type TxStatusMer,
 } from "./token";
 
 // ปุ่มจำลองแสดงเสมอ (รวมบน Vercel) — ถ้าจะซ่อนตอนใช้งานจริง ตั้ง NEXT_PUBLIC_HIDE_SIM=1 แล้ว redeploy
@@ -57,7 +58,7 @@ export const clearScanResultMer = () => writeResultMer(null);
 /**
  * จำลอง/รับผลการสแกน 1 ครั้ง → บันทึกรายการ + เก็บผลไว้ให้หน้าผลลัพธ์
  *  • success       → บันทึก Token เข้าร้านทันที
- *  • insufficient  → ไม่บันทึก (ยังไม่มีการหัก Token)
+ *  • insufficient  → บันทึกเป็น "insufficient" (ยังไม่มีการหัก Token)
  *  • disconnected  → บันทึกเป็น "pending" รอยืนยัน (ห้ามส่งมอบสินค้า)
  */
 export function runScanMer(kindMer: ScanKindMer, qtyOverrideMer?: number): ScanResultMer {
@@ -73,18 +74,15 @@ export function runScanMer(kindMer: ScanKindMer, qtyOverrideMer?: number): ScanR
   const nowMer = new Date();
   const sentAtMer = new Date(nowMer.getTime() - 60_000); // สมมุติว่าส่งยอดไปก่อนหน้า 1 นาที
 
-  let txIdMer: string | undefined;
-  let refNoMer: string | undefined;
-  if (outcomeMer === "success") {
-    const txMer = actions.receiveTokens({ payerName: SIM_CUSTOMER_NAME_MER, qty: qtyMer });
-    txIdMer = txMer.id; refNoMer = txMer.ref;
-  } else if (outcomeMer === "disconnected") {
-    const txMer = actions.receiveTokens({ payerName: UNKNOWN_PAYER_NAME_MER, qty: qtyMer, status: "pending" });
-    txIdMer = txMer.id; refNoMer = txMer.ref;
-  }
+  const statusMer: TxStatusMer = outcomeMer === "success"
+    ? "success"
+    : outcomeMer === "insufficient" ? "insufficient" : "pending";
+  const payerNameMer = outcomeMer === "disconnected" ? UNKNOWN_PAYER_NAME_MER : SIM_CUSTOMER_NAME_MER;
+  const txMer = actions.receiveTokens({ payerName: payerNameMer, qty: qtyMer, status: statusMer });
 
   const resultMer = buildScanResultMer({
     kind: outcomeMer,
+    orderNo: txMer.orderNo,
     productName: productMer.name,
     unitPrice: productMer.unitPrice,
     qty: qtyMer,
@@ -92,8 +90,8 @@ export function runScanMer(kindMer: ScanKindMer, qtyOverrideMer?: number): ScanR
     sentAt: sentAtMer,
     scannedAt: outcomeMer === "disconnected" ? undefined : nowMer,
     checkedAt: nowMer,
-    txId: txIdMer,
-    refNo: refNoMer,
+    txId: txMer.id,
+    refNo: txMer.ref,
   });
   writeResultMer(resultMer);
   return resultMer;

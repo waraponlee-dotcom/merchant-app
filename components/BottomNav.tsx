@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IconChart, IconHelp, IconHome, IconScan } from "./icons";
+import LogoutButton from "./LogoutButton";
 
 const items = [
   { href: "/", label: "หน้าหลัก", icon: <IconHome /> },
@@ -13,7 +14,7 @@ const items = [
 export default function BottomNav() {
   const path = usePathname();
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[430px] px-4 pb-[max(1rem,env(safe-area-inset-bottom))]" aria-label="เมนูหลัก">
+    <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto w-full max-w-[430px] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:hidden" aria-label="เมนูหลัก">
       <ul className="flex items-center justify-around rounded-[26px] bg-ink/95 p-2 text-white shadow-xl backdrop-blur">
         {items.map((it) => {
           const active = it.href === "/" ? path === "/" : path.startsWith(it.href);
@@ -26,6 +27,9 @@ export default function BottomNav() {
             </li>
           );
         })}
+        <li>
+          <LogoutButton className="grid h-12 w-12 place-items-center rounded-2xl text-white transition hover:bg-white/10 active:scale-95" />
+        </li>
       </ul>
     </nav>
   );

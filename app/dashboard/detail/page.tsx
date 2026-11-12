@@ -10,7 +10,7 @@ export default function DashboardDetailPage() {
   if (!s) return <LoadingScreen />;
   const { product: pr, tokenSymbol: tkn, notice } = s.config;
   const sum = summarize(s);
-  const cols = "grid grid-cols-[3.5rem_minmax(0,1fr)_4.25rem_4.5rem] items-center gap-2";
+  const cols = "grid grid-cols-[6rem_minmax(0,1fr)_4.25rem_4.5rem] items-center gap-2";
   const repCols = "grid grid-cols-[minmax(0,1fr)_3.5rem_5.5rem] items-center gap-2";
 
   return (
@@ -23,13 +23,13 @@ export default function DashboardDetailPage() {
         </div>
         <div className="rounded-3xl border border-line bg-white px-4 pb-1 pt-3 text-sm">
           <div className={`${cols} border-b border-line pb-2 text-xs text-muted`}>
-            <span>วัน/เวลา</span><span>จำนวนสินค้า</span><span className="text-right">Token ที่ใช้</span><span className="text-center">สถานะ</span>
+            <span>ออเดอร์ / วันเวลา</span><span>จำนวนสินค้า</span><span className="text-right">Token ที่ใช้</span><span className="text-center">สถานะ</span>
           </div>
           {sum.latest.length === 0 && <p className="py-6 text-center text-xs text-muted">ยังไม่มีรายการ</p>}
           <ul>
             {sum.latest.map((t) => (
               <li key={t.id} className={`${cols} border-b border-line py-3 last:border-0`}>
-                <span className="leading-tight"><span className="block text-[11px] text-muted">{fmtDate(t.at)}</span><span className="block font-bold">{fmtTime(t.at)}</span></span>
+                <span className="leading-tight"><span className="block truncate text-[11px] font-bold">{t.orderNo}</span><span className="block text-[10px] text-muted">{fmtDate(t.at)} {fmtTime(t.at)}</span></span>
                 <span className="truncate font-bold">{pr.name} ×{t.qty}</span>
                 <span className="text-right font-semibold">{fmtNum(t.tokens)} {tkn}</span>
                 <StatusBadge status={t.status} />
