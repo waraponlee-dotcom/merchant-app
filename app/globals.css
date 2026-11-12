@@ -51,13 +51,6 @@ button {
   padding-bottom: calc(env(safe-area-inset-bottom) + 2.5rem);
 }
 
-@media (min-width: 431px) {
-  .app-frame {
-    border: 1px solid #d5d2df;
-    box-shadow: 0 0 32px rgba(28, 27, 58, 0.14);
-  }
-}
-
 @media (min-width: 768px) {
   html,
   body {
