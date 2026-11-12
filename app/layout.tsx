@@ -30,9 +30,9 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     <html lang="th" className={thai.variable}>
       <body>
         {/* overflow-x-clip (not hidden) so sticky headers keep working */}
-        <div className="relative min-h-dvh w-full overflow-x-clip bg-canvas">
+        <div className="relative min-h-dvh w-full overflow-x-clip bg-[#e8e7ed]">
           <ConfigSync />
-          <div className="mx-auto min-h-dvh w-full max-w-[430px]">{children}</div>
+          <div className="app-frame mx-auto min-h-dvh w-full max-w-[430px] bg-canvas">{children}</div>
         </div>
       </body>
     </html>
