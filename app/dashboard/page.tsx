@@ -76,23 +76,24 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-dvh pb-32 md:pb-10">
-      <Hero className="safe-top-hero px-5 pb-10 md:px-10 md:pb-12">
+    <main className="min-h-dvh pb-32">
+      <Hero className="safe-top-hero px-5 pb-10">
         <h1 className="text-[32px] font-extrabold leading-tight">แดชบอร์ดร้าน</h1>
         <p className="mt-1 text-sm text-white/85">{p.shopName}</p>
       </Hero>
 
-      <div className="relative -mt-6 space-y-3 rounded-t-[28px] bg-canvas px-5 pt-5 md:mx-auto md:-mt-8 md:grid md:max-w-[1240px] md:grid-cols-12 md:gap-5 md:space-y-0 md:px-8 md:pb-8 md:pt-6">
-        <div className="flex items-center justify-between md:col-span-12">
+      <div className="relative -mt-6 space-y-3 rounded-t-[28px] bg-canvas px-5 pt-5">
+        <div className="flex items-center justify-between">
           <h2 className="text-base font-extrabold">สรุปภาพรวม</h2>
           <div className="flex items-center gap-2">
             <button type="button" onClick={exportCsv} className="rounded-full border border-line bg-white px-4 py-2.5 text-sm font-bold transition active:scale-95">ส่งออก CSV</button>
             <Link href="/dashboard/detail" className="rounded-full bg-ink px-4 py-2.5 text-sm font-bold text-white transition active:scale-95">ดูเพิ่มเติม</Link>
           </div>
         </div>
-        {exportError && <p role="alert" className="rounded-xl bg-rose/10 px-4 py-2 text-sm font-semibold text-roseink md:col-span-12">{exportError}</p>}
+        <Link href="/dashboard/all" className="block w-fit py-1 text-sm font-semibold text-brand">ดูธุรกรรมย้อนหลังตามวันที่ →</Link>
+        {exportError && <p role="alert" className="rounded-xl bg-rose/10 px-4 py-2 text-sm font-semibold text-roseink">{exportError}</p>}
 
-        <div className="grid grid-cols-2 gap-3 md:col-span-12 md:grid-cols-4 md:gap-5">
+        <div className="grid grid-cols-2 gap-3">
           <Stat icon={<IconTrend size={16} />} tone="brand" label="ยอดขายรวม">{fmtNum(sum.totalTokens)} <Unit>{tkn}</Unit></Stat>
           <Stat icon={<IconBag size={16} />} tone="rose" label="จำนวนที่ขายแล้ว">{fmtNum(sum.totalQty)} <Unit>{pr.unit}</Unit></Stat>
           <Stat icon={<IconBox size={16} />} tone="amber" label="สินค้าคงเหลือ">
@@ -101,7 +102,7 @@ export default function DashboardPage() {
           <Stat icon={<IconDown size={16} />} tone="mint" label="Token ที่รับวันนี้">+{fmtNum(sum.todayTokens)} <Unit>{tkn}</Unit></Stat>
         </div>
 
-        <section className="pt-3 md:col-span-6 md:pt-1">
+        <section className="pt-3">
         <h2 className="mb-3 text-base font-extrabold">ข้อมูลร้านค้า</h2>
         <dl className="divide-y divide-line rounded-3xl border border-line bg-white px-4 text-sm">
           <div className="flex items-center justify-between gap-4 py-3"><dt className="text-muted">ชื่อร้าน</dt><dd className="truncate font-bold">{p.shopName}</dd></div>
@@ -113,7 +114,7 @@ export default function DashboardPage() {
         </dl>
         </section>
 
-        <section className="pt-3 md:col-span-6 md:pt-1">
+        <section className="pt-3">
         <h2 className="mb-3 text-base font-extrabold">คลังสินค้า</h2>
         <div className="grid grid-cols-2 gap-3 rounded-3xl border border-line bg-white p-4">
           <div>

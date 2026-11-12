@@ -19,7 +19,7 @@ export default function DashboardDetailPage() {
       <div className="space-y-3 px-5 pt-5">
         <div className="flex items-end justify-between">
           <h2 className="text-base font-extrabold">รายการล่าสุด</h2>
-          <Link href="/dashboard/all" className="py-1 text-sm font-semibold text-brand">ดูทั้งหมด</Link>
+          <Link href="/dashboard/all" className="py-1 text-sm font-semibold text-brand">ดูย้อนหลัง</Link>
         </div>
         <div className="rounded-3xl border border-line bg-white px-4 pb-1 pt-3 text-sm">
           <div className={`${cols} border-b border-line pb-2 text-xs text-muted`}>

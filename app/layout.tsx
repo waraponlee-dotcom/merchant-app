@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Noto_Sans_Thai } from "next/font/google";
 import ConfigSync from "@/components/ConfigSync";
-import TabletNav from "@/components/TabletNav";
 import "./globals.css";
 
 const thai = Noto_Sans_Thai({
@@ -33,8 +32,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         {/* overflow-x-clip (not hidden) so sticky headers keep working */}
         <div className="relative min-h-dvh w-full overflow-x-clip bg-canvas">
           <ConfigSync />
-          <TabletNav />
-          <div className="min-h-dvh md:pl-[88px] lg:pl-[224px]">{children}</div>
+          <div className="mx-auto min-h-dvh w-full max-w-[430px]">{children}</div>
         </div>
       </body>
     </html>
